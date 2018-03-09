@@ -25,7 +25,7 @@
 
 struct _Sprite
 {
-  //  _Sprite() = default;
+  _Sprite() = default;
   _Sprite(std::shared_ptr<SDL_Texture> texture) { this->texture = texture; }
 
   std::shared_ptr<SDL_Texture> texture;  /// texture resource this sprite uses
