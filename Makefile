@@ -7,8 +7,8 @@ default: pacman
 clean:
 	rm *.o pacman
 
-pacman: game.o input.o graphics.o gamestate.o
-	$(CC) $(CFLAGS) -o pacman main.cpp game.o input.o graphics.o gamestate.o $(CLINK)
+pacman: game.o input.o graphics.o gamestate.o maze.o
+	$(CC) $(CFLAGS) -o pacman main.cpp game.o input.o graphics.o gamestate.o maze.o $(CLINK)
 
 game.o: Game.cpp 
 	$(CC) -c -o game.o $(CFLAGS) Game.cpp $(CLINK)
@@ -21,3 +21,6 @@ graphics.o: Graphics.cpp
 
 gamestate.o: GameState.cpp 
 	$(CC) -c -o gamestate.o $(CFLAGS) GameState.cpp $(CLINK)
+
+maze.o: Maze.cpp 
+	$(CC) -c -o maze.o $(CFLAGS) Maze.cpp $(CLINK)

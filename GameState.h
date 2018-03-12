@@ -4,6 +4,7 @@
 #include "State.h"
 #include "Input.h"
 #include "Graphics.h"
+#include "Maze.h"
 
 class GameState : public State
 {
@@ -24,8 +25,12 @@ class GameState : public State
   Animation pacman_down;
   Animation *pacman;
   Sprite maze;
+  Maze maze_obj;
  
   int vx, vy;
   int x, y;
+  int direction;
+  int next_direction;
+  bool changed;
 };
 #endif

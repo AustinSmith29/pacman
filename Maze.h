@@ -60,11 +60,19 @@ class Maze
    * Places the specified Tile type at the given coordinates.
    **/
   void insert_at(TileType obj, int x, int y);
-
+  
   /**
    * Sets the Tile at the given coordinates to an OPEN tile type.
    **/
   void remove_at(int x, int y);
+
+  /** Used to snap pacman/ghost to the center of the current tile they are in along given coordinate.
+   *  Primarily used when changing directions at intersections to keep everything aligned.
+   *  @param x the screen position that will become aligned.
+   *  @return the snapped screen position
+   **/
+  int snap_x(int x);
+  int snap_y(int y);
 
   void draw(SDL_Renderer *renderer);
 

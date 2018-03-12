@@ -11,7 +11,7 @@ Game::Game()
   quit = false;
   SDL_Init(SDL_INIT_EVERYTHING);
 
-  if(SDL_CreateWindowAndRenderer(640, 480, SDL_WINDOW_RESIZABLE, 
+  if(SDL_CreateWindowAndRenderer(640, 500, SDL_WINDOW_RESIZABLE, 
 				 &window, &renderer))
     {
       std::cout << "Could not create window and renderer: " << SDL_GetError() << std::endl;

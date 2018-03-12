@@ -2,7 +2,6 @@
 #include <stdexcept>
 #include <iostream>
 
-//37 Width
 int starting_state[][MAZE_WIDTH] = {
   {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
   {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
@@ -90,6 +89,29 @@ Maze::remove_at(int x, int y)
   if (!in_bounds(x, y))
     throw std::runtime_error("Maze::remove_at() out of bounds!");
   tiles[std::make_pair(x, y)].type = TileType::OPEN;
+}
+
+int
+Maze::snap_x(int x)
+{
+  // Convert to grid position
+  x -= x_offset;
+  x /= TILE_SIZE;
+
+  // Convert back to screen position (effectivley dropped overlap)
+  x = x * TILE_SIZE;
+  x += x_offset;
+  return x;
+}
+
+int
+Maze::snap_y(int y)
+{
+  y -= y_offset;
+  y /= TILE_SIZE;
+  y = y * TILE_SIZE;
+  y += y_offset;
+  return y;
 }
 
 void
