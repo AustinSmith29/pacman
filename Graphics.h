@@ -122,4 +122,5 @@ void draw_sprite(SDL_Renderer *renderer, Sprite &sprite, int x, int y);
 
 void play_animation(SDL_Renderer *renderer, Animation &animation, int x, int y);
 void pause_animation(Animation &animation);
+void unpause_animation(Animation &animation);
 #endif

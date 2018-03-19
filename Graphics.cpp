@@ -176,9 +176,18 @@ void play_animation(SDL_Renderer *renderer, Animation &animation, int x, int y)
 	  animation->current_frame = 0;
 	}
     }
+  else
+    {
+      draw_single_frame_animation(renderer, animation, x, y);
+    }
 }
 
 void pause_animation(Animation &animation)
 {
   animation->paused = true;
+}
+
+void unpause_animation(Animation &animation)
+{
+  animation->paused = false;
 }
