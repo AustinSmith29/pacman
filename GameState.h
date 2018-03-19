@@ -5,6 +5,7 @@
 #include "Input.h"
 #include "Graphics.h"
 #include "Maze.h"
+#include "Pacman.h"
 
 class GameState : public State
 {
@@ -19,18 +20,8 @@ class GameState : public State
 
  private:
   Input input;
-  Animation pacman_right;
-  Animation pacman_up;
-  Animation pacman_left;
-  Animation pacman_down;
-  Animation *pacman;
+  Pacman pacman;
   Sprite maze;
   Maze maze_obj;
- 
-  int vx, vy;
-  int x, y;
-  int direction;
-  int next_direction;
-  bool changed;
 };
 #endif
