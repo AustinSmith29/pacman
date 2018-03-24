@@ -2,7 +2,7 @@
  *  @brief Contains the definition for the maze that pacman/ghosts navigate.
  *
  *  @author Austin Smith
- *  @bugs No know bugs
+ *  @bugs No known bugs
  **/
 
 #ifndef _MAZE_H
@@ -11,6 +11,7 @@
 #include "Graphics.h"
 
 #include <map>
+#include <stack>
 
 #define MAZE_WIDTH   28
 #define MAZE_HEIGHT  31
@@ -36,7 +37,7 @@ enum TileType
 struct Tile
 {
   Tile() = default;
-Tile(int x, int y, TileType type) : x(x), y(y), type(type) {}
+  Tile(int x, int y, TileType type) : x(x), y(y), type(type) {}
   int x, y;
   TileType type;
 };
@@ -46,8 +47,15 @@ class Maze
  public:
   Maze();
 
+  friend std::stack<std::pair<int,int>> dikstra(int target_x, int target_y,
+						int from_x, int from_y, Maze &maze);
+  friend std::stack<std::pair<int,int>> get_path(std::map<std::pair<int,int>, std::pair<int,int>>
+						 parent,
+						 std::pair<int, int>,
+						 Maze &maze);
+
   void reset();
-  
+ 
   /**
    * Returns the tile at the specified screen coordinates.
    * @param x the x SCREEN coordinate
@@ -80,6 +88,32 @@ class Maze
   Sprite tile_sprites[10];
   std::map<std::pair<int, int>, Tile> tiles;
   int x_offset, y_offset;  /// screen_location of top-left corner of maze
+
+  /**
+   * Checks if screen coordinates are within designated area for maze.
+   * @param x the x SCREEN coordinate
+   * @param y the y SCREEN coordinate
+   * @return true if in bounds, false otherwise.
+   **/
   bool in_bounds(int x, int y);
+
+  /**
+   * Converts screen coordinates into grid coordinates that can index an array.
+   **/
+  void screen_to_grid(int &screen_x, int &screen_y);
+
+  /**
+   * Converts grid coordinates into screen coordinates.
+   **/
+  void grid_to_screen(int &grid_x, int &grid_y);
 };
+
+std::stack<std::pair<int,int>> dikstra(int target_x, int target_y,
+				       int from_x, int from_y,
+				       Maze &maze);
+
+std::stack<std::pair<int,int>> get_path(std::map<std::pair<int,int>, std::pair<int,int>>
+						 parent,
+					std::pair<int, int> target,
+					Maze &maze);
 #endif
