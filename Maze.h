@@ -90,7 +90,7 @@ class Maze
   Sprite tile_sprites[10];
   std::map<cell, Tile> tiles;
   std::map<cell, std::vector<cell>> neighbors; /// cell --> vector of surrounding cells
-  int x_ofnfset, y_offset;  /// screen_location of top-left corner of maze
+  int x_offset, y_offset;  /// screen_location of top-left corner of maze
 
   /**
    * Checks if screen coordinates are within designated area for maze.
