@@ -46,6 +46,9 @@ Pacman::move_down()
   changed_direction = (next_direction == direction) ? false : true;
 }
 
+int Pacman::get_x() { return x; }
+int Pacman::get_y() { return y; }
+
 void
 Pacman::update(Maze &maze)
 {
@@ -75,7 +78,7 @@ Pacman::change_direction(Maze &maze)
 	  velocity_x = 0;
 	  velocity_y = -2;
 	  x = maze.snap_x(x+8);
-	  unpause_animation(*current_animation);
+	  switch_animation(*current_animation, pacman_up);
 	  current_animation = &pacman_up;
 	  direction = UP;
 	}
@@ -87,7 +90,7 @@ Pacman::change_direction(Maze &maze)
 	  velocity_x = 2;
 	  velocity_y = 0;
 	  y = maze.snap_y(y+8);
-	  unpause_animation(*current_animation);
+	  switch_animation(*current_animation, pacman_right);
 	  current_animation = &pacman_right;
 	  direction = RIGHT;
 	}
@@ -99,7 +102,7 @@ Pacman::change_direction(Maze &maze)
 	  velocity_x = 0;
 	  velocity_y = 2;
 	  x = maze.snap_x(x+8);
-	  unpause_animation(*current_animation);
+	  switch_animation(*current_animation, pacman_down);
 	  current_animation = &pacman_down;
 	  direction = DOWN;
 	}
@@ -111,7 +114,7 @@ Pacman::change_direction(Maze &maze)
 	  velocity_x = -2;
 	  velocity_y = 0;
 	  y = maze.snap_y(y+8);
-	  unpause_animation(*current_animation);
+	  switch_animation(*current_animation, pacman_left);
 	  current_animation = &pacman_left;
 	  direction = LEFT;
 	}

@@ -16,6 +16,9 @@ class Pacman
   void move_right();
   void move_down();
 
+  int get_x();
+  int get_y();
+
   void update(Maze &maze);
   void draw(SDL_Renderer *renderer);
   
