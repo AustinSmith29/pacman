@@ -53,6 +53,10 @@ Ghost::update(Maze &maze)
 	  if (dy > 0)
 	    y += 2;
 	}
+      else
+	{
+	  go_to(225, 16, maze);
+	}
       break;
     case SCARED:
       break;

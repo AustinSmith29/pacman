@@ -17,6 +17,8 @@
 #define MAZE_HEIGHT  31
 #define TILE_SIZE    16
 
+typedef std::pair<int,int> cell; /// represents grid cell in Maze
+
 enum TileType
   {
     OPEN,
@@ -47,12 +49,12 @@ class Maze
  public:
   Maze();
 
-  friend std::stack<std::pair<int,int>> dikstra(int target_x, int target_y,
-						int from_x, int from_y, Maze &maze);
-  friend std::stack<std::pair<int,int>> get_path(std::map<std::pair<int,int>, std::pair<int,int>>
-						 parent,
-						 std::pair<int, int>,
-						 Maze &maze);
+  friend std::stack<cell> dikstra(int target_x, int target_y,
+				  int from_x, int from_y, Maze &maze);
+  
+  friend std::stack<cell> get_path(std::map<cell, cell> parent,
+				   cell target,
+				   Maze &maze);
 
   void reset();
  
@@ -86,8 +88,9 @@ class Maze
 
  private:
   Sprite tile_sprites[10];
-  std::map<std::pair<int, int>, Tile> tiles;
-  int x_offset, y_offset;  /// screen_location of top-left corner of maze
+  std::map<cell, Tile> tiles;
+  std::map<cell, std::vector<cell>> neighbors; /// cell --> vector of surrounding cells
+  int x_ofnfset, y_offset;  /// screen_location of top-left corner of maze
 
   /**
    * Checks if screen coordinates are within designated area for maze.
@@ -106,14 +109,23 @@ class Maze
    * Converts grid coordinates into screen coordinates.
    **/
   void grid_to_screen(int &grid_x, int &grid_y);
+
+  /**
+   * Called in constructor. Forms connections between cells to create graph.
+   **/
+  void setup_neighbors();
+
+  /** 
+   * Given a cell in the map, return vector of cells around that cell that are passable.
+   **/
+  std::vector<cell> get_neighbors(cell at);
 };
 
-std::stack<std::pair<int,int>> dikstra(int target_x, int target_y,
-				       int from_x, int from_y,
-				       Maze &maze);
+std::stack<cell> dikstra(int target_x, int target_y,
+			 int from_x, int from_y,
+			 Maze &maze);
 
-std::stack<std::pair<int,int>> get_path(std::map<std::pair<int,int>, std::pair<int,int>>
-						 parent,
-					std::pair<int, int> target,
-					Maze &maze);
+std::stack<cell> get_path(std::map<cell, cell> parent,
+			  cell target,
+			  Maze &maze);
 #endif
