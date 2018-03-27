@@ -78,7 +78,8 @@ Maze::reset()
 	  switch(starting_state[y][x])
 	    {
 	    case TileType::OPEN:
-	      tiles[coord] = Tile(x, y, TileType::OPEN);
+	      // DOT because fuck changing all those 0s in starting state for testing.
+	      tiles[coord] = Tile(x, y, TileType::DOT);
 	      break;
 	    case TileType::WALL:
 	      tiles[coord] = Tile(x, y, TileType::WALL);
@@ -107,6 +108,7 @@ Maze::item_at(int x, int y)
 void
 Maze::remove_at(int x, int y)
 {
+  screen_to_grid(x, y);
   if (!in_bounds(x, y))
     throw std::runtime_error("Maze::remove_at() out of bounds!");
   tiles[std::make_pair(x, y)].type = TileType::OPEN;
@@ -148,11 +150,24 @@ Maze::draw(SDL_Renderer *renderer)
 	      TILE_SIZE,
 	      TILE_SIZE
 	   };
+	  auto c = std::make_pair(x,y);
 
-	  if (tiles[std::make_pair(x, y)].type == TileType::WALL)
+	  if (tiles[c].type == TileType::WALL)
 	    {
 	      SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 	      SDL_RenderDrawRect(renderer, &tile_bounds);
+	    }
+	  if (tiles[c].type == TileType::DOT)
+	    {
+	      SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+	      // Obviously a temporary solution until tiles.
+	      SDL_Rect dot {
+		tile_bounds.x + 6,
+		  tile_bounds.y + 6,
+		  4, 4
+		  };
+		  
+	      SDL_RenderDrawRect(renderer, &dot);
 	    }
 	}
     }
@@ -187,7 +202,7 @@ Maze::get_neighbors(cell at)
   auto left = tiles.find(std::make_pair(at.first-1, at.second));
 
   auto add_empty = [this, &passable_cells](decltype(top) cell_iter) -> void {
-    if (cell_iter != tiles.end() && tiles.find(cell_iter->first)->second.type == TileType::OPEN)
+    if (cell_iter != tiles.end() && tiles.find(cell_iter->first)->second.type != TileType::WALL)
       {
 	passable_cells.push_back(cell_iter->first);
       }
@@ -288,6 +303,9 @@ std::stack<cell> dikstra(int target_x, int target_y,
 
       // Select next best cell.
       auto candidates = maze.neighbors[current_cell];
+      // Hack for right now... look up A* to see how to deal with this.
+      if (candidates.size() == 0)
+	break;
       cell next_cell = apply_heuristic(candidates, visited, target_cell);
       parent[next_cell] = current_cell;
       

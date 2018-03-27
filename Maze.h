@@ -2,7 +2,8 @@
  *  @brief Contains the definition for the maze that pacman/ghosts navigate.
  *
  *  @author Austin Smith
- *  @bugs No known bugs
+ *  @bugs Moving Left/Down/Right/Down/Left/Down/Right/Down causes Segfault.
+ *  Segfault is suspected to be caused in dijiskstra/get_path. 
  **/
 
 #ifndef _MAZE_H
