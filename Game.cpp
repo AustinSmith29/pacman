@@ -17,6 +17,7 @@ Game::Game()
       std::cout << "Could not create window and renderer: " << SDL_GetError() << std::endl;
       throw std::runtime_error("Could not start up.");
     }
+  SDL_SetWindowTitle(window, "Pac-Man Clone by Austin Smith");
 
   // Register Services
   graphics_registry.register_service(renderer);
@@ -28,6 +29,11 @@ Game::Game()
 
 Game::~Game()
 {
+  while (!state_stack.empty())
+   {
+	  delete state_stack.top();
+      state_stack.pop();
+   }
   SDL_DestroyRenderer(renderer);
   SDL_DestroyWindow(window);
   SDL_Quit();

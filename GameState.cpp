@@ -10,7 +10,10 @@ GameState::GameState(GraphicsLoader *graphics_loader)
   input.bind(SDLK_SPACE, "stop");
 
   pacman.init(graphics_loader);
-  test_bitch.init(graphics_loader);
+  test_bitch.init(graphics_loader, 318, 20, ChaseFunction::red_ghost, 318, 20);
+  //test_bitch2.init(graphics_loader, 318, 272);
+  //test_bitch3.init(graphics_loader, 420, 272);
+  //test_bitch4.init(graphics_loader, 250, 272);
   maze = graphics_loader->load_sprite("maze.bmp");
 }
 
@@ -38,7 +41,13 @@ GameState::update_logic()
   pacman.update(maze_obj);
   int px = pacman.get_x();
   int py = pacman.get_y();
-  test_bitch.update(maze_obj, px, py);
+  AIState state;
+  state.pacman_x = px;
+  state.pacman_y = py;
+  test_bitch.update(maze_obj, state);
+  //  test_bitch2.update(maze_obj, state);
+  //test_bitch3.update(maze_obj, state);
+  //test_bitch4.update(maze_obj, state);
 
   if (maze_obj.item_at(px, py) == TileType::DOT)
     {
@@ -51,5 +60,8 @@ GameState::draw(SDL_Renderer *renderer)
 {
   maze_obj.draw(renderer);
   test_bitch.draw(renderer);
+  //test_bitch2.draw(renderer);
+  //test_bitch3.draw(renderer);
+  //test_bitch4.draw(renderer);
   pacman.draw(renderer);
 }

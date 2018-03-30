@@ -182,6 +182,12 @@ void play_animation(SDL_Renderer *renderer, Animation &animation, int x, int y)
     }
 }
 
+void switch_animation(Animation &old_anim, Animation &new_anim)
+{
+  pause_animation(old_anim);
+  unpause_animation(new_anim);
+}
+
 void pause_animation(Animation &animation)
 {
   animation->paused = true;

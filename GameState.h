@@ -6,6 +6,7 @@
 #include "Graphics.h"
 #include "Maze.h"
 #include "Pacman.h"
+#include "Ghost.h"
 
 class GameState : public State
 {
@@ -23,5 +24,9 @@ class GameState : public State
   Pacman pacman;
   Sprite maze;
   Maze maze_obj;
+  Ghost test_bitch;
+  Ghost test_bitch2;
+  Ghost test_bitch3;
+  Ghost test_bitch4;
 };
 #endif

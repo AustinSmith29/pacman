@@ -6,6 +6,7 @@
 class State
 {
  public:
+  virtual ~State() {}
   virtual void handle_input(SDL_Event &e) = 0;
   virtual void update_logic() = 0;
   virtual void draw(SDL_Renderer *renderer) = 0;
