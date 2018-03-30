@@ -53,6 +53,15 @@ GameState::update_logic()
     {
       maze_obj.remove_at(px, py);
     }
+
+  if (maze_obj.item_at(px, py) == TileType::BIGDOT)
+    {
+      maze_obj.remove_at(px, py);
+      test_bitch.set_state(GhostState::SCARED);
+      test_bitch2.set_state(GhostState::SCARED);
+      test_bitch3.set_state(GhostState::SCARED);
+      test_bitch4.set_state(GhostState::SCARED);
+    }
 }
 
 void 

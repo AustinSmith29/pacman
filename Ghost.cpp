@@ -89,6 +89,7 @@ Ghost::init(GraphicsLoader *loader, int x, int y,
   scatter_x = scat_x;
   scatter_y = scat_y;
   speed = 2;
+  current_speed = speed;
   current_state = GhostState::CHASE;
   has_path = false;
   path_ticks = 0;
@@ -116,6 +117,11 @@ Ghost::update(Maze &maze, AIState &state)
         }
       break;
     case SCARED:
+      if (!has_path || path_ticks >= path_timer)
+        {
+          cell random_cell = maze.random_cell();
+          go_to(random_cell.first, random_cell.second, maze);
+        }
       break;
     }
 
@@ -131,18 +137,18 @@ Ghost::update(Maze &maze, AIState &state)
       int dx = target_x - x;
       int dy = target_y - y;
       if (dx < 0)
-        x -= speed;
+        x -= current_speed;
       if (dx > 0)
-        x += speed;
+        x += current_speed;
       if (dy < 0)
-        y -= speed;
+        y -= current_speed;
       if (dy > 0)
-        y += speed;
+        y += current_speed;
     }
   else
     {
       has_path = false;
-    }   
+    } 
   path_ticks++;
 }
 
@@ -157,6 +163,11 @@ Ghost::go_to(int tx, int ty, Maze &maze)
 void
 Ghost::set_state(GhostState new_state)
 {
+  if (new_state == GhostState::SCARED)
+    current_speed = SCARED_SPEED;
+  else
+    current_speed = speed;
+
   current_state = new_state;
 }
 

@@ -23,13 +23,13 @@ typedef std::pair<int,int> cell; /// represents grid cell in Maze
 
 enum TileType
   {
-    OPEN,
-    WALL,
-    TUNNEL,
     DOT,
+    WALL,
+    OPEN,
     BIGDOT,
-    JUNCTOIN,
+    TUNNEL,
     GATE,
+    JUNCTION,
     CHERRY,
     STRAWBERRY,
     ORANGE,
@@ -78,6 +78,11 @@ class Maze
    **/
   void remove_at(int x, int y);
 
+  /**
+   * Gets a random cell from the map. Used to randomly move ghosts when they are scared.
+   **/
+  cell random_cell();
+
   /** Used to snap pacman/ghost to the center of the current tile they are in along given coordinate.
    *  Primarily used when changing directions at intersections to keep everything aligned.
    *  @param x the screen position that will become aligned.
@@ -85,6 +90,16 @@ class Maze
    **/
   int snap_x(int x);
   int snap_y(int y);
+
+  /**
+   * Converts screen coordinates into grid coordinates that can index an array.
+   **/
+  void screen_to_grid(int &screen_x, int &screen_y);
+
+  /**
+   * Converts grid coordinates into screen coordinates.
+   **/
+  void grid_to_screen(int &grid_x, int &grid_y);
 
   void draw(SDL_Renderer *renderer);
 
@@ -101,16 +116,6 @@ class Maze
    * @return true if in bounds, false otherwise.
    **/
   bool in_bounds(int x, int y);
-
-  /**
-   * Converts screen coordinates into grid coordinates that can index an array.
-   **/
-  void screen_to_grid(int &screen_x, int &screen_y);
-
-  /**
-   * Converts grid coordinates into screen coordinates.
-   **/
-  void grid_to_screen(int &grid_x, int &grid_y);
 
   /**
    * Called in constructor. Forms connections between cells to create graph.

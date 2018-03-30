@@ -6,6 +6,9 @@
 
 #include <functional>
 
+
+#define SCARED_SPEED 1
+
 /**
  * AIState contains information that is important for Ghost path calculations.
  **/
@@ -70,6 +73,7 @@ class Ghost
   int x, y;
   int scatter_x, scatter_y;
   int speed;
+  int current_speed;          /// speed changes when ghost becomes scared.
   Sprite sprite;
   GhostState current_state;
   int path_timer;             /// When path_ticks > path_timer recalculate path.

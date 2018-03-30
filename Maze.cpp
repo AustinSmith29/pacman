@@ -3,34 +3,34 @@
 #include <stdexcept>
 #include <iostream>
 #include <algorithm>
-
-#define MIN(a, b) ((a) < (b)) ? (a) : (b)
+#include <cstdlib> // for rand()
+#include <ctime>   // ditto
 
 int starting_state[][MAZE_WIDTH] = {
   {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
   {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
   {1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1},
-  {1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1},
+  {1, 3, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 3, 1},
   {1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1},
   {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
   {1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1},
   {1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1},
   {1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1},
-  {1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1},
-  {1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1},
-  {1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1},
-  {1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1},
-  {1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1},
-  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-  {1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1},
-  {1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1},
-  {1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1},
-  {1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1},
-  {1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1},
+  {1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1},
+  {1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1},
+  {1, 1, 1, 1, 1, 1, 0, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 0, 1, 1, 1, 1, 1, 1},
+  {1, 1, 1, 1, 1, 1, 0, 1, 1, 2, 1, 1, 1, 5, 5, 1, 1, 1, 2, 1, 1, 0, 1, 1, 1, 1, 1, 1},
+  {1, 1, 1, 1, 1, 1, 0, 1, 1, 2, 1, 2, 2, 2, 2, 2, 2, 1, 2, 1, 1, 0, 1, 1, 1, 1, 1, 1},
+  {4, 4, 4, 4, 4, 4, 0, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 0, 4, 4, 4, 4, 4, 4},
+  {1, 1, 1, 1, 1, 1, 0, 1, 1, 2, 1, 2, 2, 2, 2, 2, 2, 1, 2, 1, 1, 0, 1, 1, 1, 1, 1, 1},
+  {1, 1, 1, 1, 1, 1, 0, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 0, 1, 1, 1, 1, 1, 1},
+  {1, 1, 1, 1, 1, 1, 0, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 0, 1, 1, 1, 1, 1, 1},
+  {1, 1, 1, 1, 1, 1, 0, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 0, 1, 1, 1, 1, 1, 1},
+  {1, 1, 1, 1, 1, 1, 0, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 0, 1, 1, 1, 1, 1, 1},
   {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
   {1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1},
   {1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1},
-  {1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1},
+  {1, 3, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 3, 1},
   {1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1},
   {1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1},
   {1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1},
@@ -68,26 +68,30 @@ Maze::Maze()
 void
 Maze::reset()
 {
+  srand(time(NULL));
   tiles.clear();
   neighbors.clear();
   for (int y = 0; y < MAZE_HEIGHT; y++)
     {
       for (int x = 0; x < MAZE_WIDTH; x++)
-	{
-	  auto coord = std::make_pair(x, y);
-	  switch(starting_state[y][x])
-	    {
-	    case TileType::OPEN:
-	      // DOT because fuck changing all those 0s in starting state for testing.
-	      tiles[coord] = Tile(x, y, TileType::DOT);
-	      break;
-	    case TileType::WALL:
-	      tiles[coord] = Tile(x, y, TileType::WALL);
-	      break;
-	    default:
-	      break;
-	    }
-	}
+        {
+          auto coord = std::make_pair(x, y);
+          switch(starting_state[y][x])
+            {
+            case TileType::DOT:
+              tiles[coord] = Tile(x, y, TileType::DOT);
+              break;
+            case TileType::WALL:
+              tiles[coord] = Tile(x, y, TileType::WALL);
+              break;
+            case TileType::BIGDOT:
+              tiles[coord] = Tile(x, y, TileType::BIGDOT);
+              break;
+            default:
+              tiles[coord] = Tile(x, y, TileType::OPEN);
+              break;
+            }
+        }
     }
   setup_neighbors();
 }
@@ -137,39 +141,57 @@ Maze::snap_y(int y)
   return y;
 }
 
+cell
+Maze::random_cell()
+{
+  int x = rand() % MAZE_WIDTH;
+  int y = rand() % MAZE_HEIGHT;
+  return std::make_pair(x, y);
+}
+
 void
 Maze::draw(SDL_Renderer *renderer)
 {
   for (int y = 0; y < MAZE_HEIGHT; y++)
     {
       for (int x = 0; x < MAZE_WIDTH; x++)
-	{
-	  SDL_Rect tile_bounds {
-	      (x*TILE_SIZE) + x_offset,
-	      (y*TILE_SIZE) + y_offset,
-	      TILE_SIZE,
-	      TILE_SIZE
-	   };
-	  auto c = std::make_pair(x,y);
+        {
+          SDL_Rect tile_bounds {
+            (x*TILE_SIZE) + x_offset,
+              (y*TILE_SIZE) + y_offset,
+              TILE_SIZE,
+              TILE_SIZE
+              };
+          auto c = std::make_pair(x,y);
 
-	  if (tiles[c].type == TileType::WALL)
-	    {
-	      SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-	      SDL_RenderDrawRect(renderer, &tile_bounds);
-	    }
-	  if (tiles[c].type == TileType::DOT)
-	    {
-	      SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-	      // Obviously a temporary solution until tiles.
-	      SDL_Rect dot {
-		tile_bounds.x + 6,
-		  tile_bounds.y + 6,
-		  4, 4
-		  };
+          if (tiles[c].type == TileType::WALL)
+            {
+              SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+              SDL_RenderDrawRect(renderer, &tile_bounds);
+            }
+          if (tiles[c].type == TileType::DOT)
+            {
+              SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+              // Obviously a temporary solution until tiles.
+              SDL_Rect dot {
+                tile_bounds.x + 6,
+                  tile_bounds.y + 6,
+                  4, 4
+                  };
 		  
-	      SDL_RenderDrawRect(renderer, &dot);
-	    }
-	}
+              SDL_RenderDrawRect(renderer, &dot);
+            }
+          if (tiles[c].type == TileType::BIGDOT)
+            {
+              SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+              SDL_Rect bigdot {
+                tile_bounds.x + 4,
+                  tile_bounds.y + 4,
+                  8, 8
+                  };
+              SDL_RenderDrawRect(renderer, &bigdot);
+            }
+        }
     }
 }
 
