@@ -212,7 +212,7 @@ Maze::get_neighbors(cell at)
   add_empty(right);
   add_empty(bottom);
   add_empty(left);
-  
+
   return passable_cells;
 }
 
@@ -224,7 +224,7 @@ static void DEBUG_PRINT_CELL(cell c)
 
 /**
  * Currently being used as the heuristic to find next cell in Dijikstra.
- * 
+ *
  * @param a,b the two cells which the distance will be computed
  * @return the manhattan distance between cells a and b
  **/
@@ -252,7 +252,7 @@ static cell apply_heuristic(std::vector<cell> candidates, std::vector<cell> visi
   for (unsigned int i = 0; i < candidates.size(); i++) {
     if (std::find(visited.begin(), visited.end(), candidates[i]) != visited.end())
       {
-	continue;
+        continue;
       }
     int d = manhattan_distance(candidates[i], target);
     if (d < small_distance || small_distance == -1) {
@@ -267,7 +267,6 @@ std::stack<cell> dikstra(int target_x, int target_y,
 			 int from_x, int from_y,
 			 Maze &maze)
 {
-  const int INF = 9999999;
   maze.screen_to_grid(target_x, target_y);
   maze.screen_to_grid(from_x, from_y);
   auto current_cell = std::make_pair(from_x, from_y);
@@ -277,7 +276,9 @@ std::stack<cell> dikstra(int target_x, int target_y,
       std::stack<cell> empty;
       return empty;
     }
+
   // Initialize distances to infinity
+  const int INF = 9999999;
   std::map<cell, int> distances;
   for (int y = 0; y < MAZE_HEIGHT; y++) {
     for (int x = 0; x < MAZE_WIDTH; x++) {
@@ -300,20 +301,26 @@ std::stack<cell> dikstra(int target_x, int target_y,
       auto current_cell = nodes.top();
       nodes.pop();
       visited.push_back(current_cell);
+      if (current_cell == target_cell)
+        break;
 
       // Select next best cell.
       auto candidates = maze.neighbors[current_cell];
       // Hack for right now... look up A* to see how to deal with this.
       if (candidates.size() == 0)
-	break;
+        break;
       cell next_cell = apply_heuristic(candidates, visited, target_cell);
       parent[next_cell] = current_cell;
       
-      if (next_cell == target_cell)
-	break;
       nodes.push(next_cell);
     }
-  std::stack<cell> path = get_path(parent, target_cell, maze);
+  // TEST: change target_cell to last visited cell since this isn't really a true dijikstra algorithm,
+  // and we are essentially just getting a single next closest square to target, then the last visited
+  // cell would be the last open cell to target. This is useful for Pacman because when calculating
+  // ghost target squares, many times the target lands on a wall or outside of the map boundry.
+  // This method just tries to get as close to that target square as possible, and makes programming
+  // the ghosts much easier at the expense of the pathfinding being sub-optimal, which I think is okay.
+  std::stack<cell> path = get_path(parent, visited.back(), maze);
   return path;
 }
 

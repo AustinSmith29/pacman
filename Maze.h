@@ -18,6 +18,7 @@
 #define MAZE_HEIGHT  31
 #define TILE_SIZE    16
 
+enum Direction { LEFT, UP, RIGHT, DOWN };
 typedef std::pair<int,int> cell; /// represents grid cell in Maze
 
 enum TileType

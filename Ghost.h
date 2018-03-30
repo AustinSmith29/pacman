@@ -24,9 +24,18 @@ class Ghost;
 class ChaseFunction
 {
  public:
+  /** Directly chase pacman **/
   static void red_ghost(Ghost &ghost, Maze &maze, AIState &state);
+
+  /** Go to place 4 cells behind pacman. Not used in original game. **/
   static void blue_ghost(Ghost &ghost, Maze &maze, AIState &state);
+
+  /** Go to place 4 cells in front of pacman. **/
   static void pink_ghost(Ghost &ghost, Maze &maze, AIState &state);
+
+  /** If > 8 cells away from pacman, directly chase pacman, else go
+   *  to scatter cell.
+   **/
   static void orange_ghost(Ghost &ghost, Maze &maze, AIState &state);
 
  private:

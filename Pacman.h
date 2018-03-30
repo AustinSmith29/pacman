@@ -4,8 +4,6 @@
 #include "Graphics.h"
 #include "Maze.h"
 
-enum Direction { LEFT, UP, RIGHT, DOWN };
-
 class Pacman
 {
  public:
@@ -18,6 +16,7 @@ class Pacman
 
   int get_x();
   int get_y();
+  Direction get_direction();
 
   void update(Maze &maze);
   void draw(SDL_Renderer *renderer);

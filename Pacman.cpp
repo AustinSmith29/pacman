@@ -48,6 +48,7 @@ Pacman::move_down()
 
 int Pacman::get_x() { return x; }
 int Pacman::get_y() { return y; }
+Direction Pacman::get_direction() { return direction; }
 
 void
 Pacman::update(Maze &maze)
@@ -74,50 +75,50 @@ Pacman::change_direction(Maze &maze)
     {
     case UP:
       if (maze.item_at(x+8, y-4) != TileType::WALL)
-	{
-	  velocity_x = 0;
-	  velocity_y = -2;
-	  x = maze.snap_x(x+8);
-	  switch_animation(*current_animation, pacman_up);
-	  current_animation = &pacman_up;
-	  direction = UP;
-	}
+        {
+          velocity_x = 0;
+          velocity_y = -2;
+          x = maze.snap_x(x+8);
+          switch_animation(*current_animation, pacman_up);
+          current_animation = &pacman_up;
+          direction = UP;
+        }
       break;
 	  
     case RIGHT:
       if (maze.item_at(x+24, y+8) != TileType::WALL)
-	{
-	  velocity_x = 2;
-	  velocity_y = 0;
-	  y = maze.snap_y(y+8);
-	  switch_animation(*current_animation, pacman_right);
-	  current_animation = &pacman_right;
-	  direction = RIGHT;
-	}
+        {
+          velocity_x = 2;
+          velocity_y = 0;
+          y = maze.snap_y(y+8);
+          switch_animation(*current_animation, pacman_right);
+          current_animation = &pacman_right;
+          direction = RIGHT;
+        }
       break;
 	  
     case DOWN:
       if (maze.item_at(x+8, y+28) != TileType::WALL)
-	{
-	  velocity_x = 0;
-	  velocity_y = 2;
-	  x = maze.snap_x(x+8);
-	  switch_animation(*current_animation, pacman_down);
-	  current_animation = &pacman_down;
-	  direction = DOWN;
-	}
+        {
+          velocity_x = 0;
+          velocity_y = 2;
+          x = maze.snap_x(x+8);
+          switch_animation(*current_animation, pacman_down);
+          current_animation = &pacman_down;
+          direction = DOWN;
+        }
       break;
 
     case LEFT:
       if (maze.item_at(x-4, y+8) != TileType::WALL)
-	{
-	  velocity_x = -2;
-	  velocity_y = 0;
-	  y = maze.snap_y(y+8);
-	  switch_animation(*current_animation, pacman_left);
-	  current_animation = &pacman_left;
-	  direction = LEFT;
-	}
+        {
+          velocity_x = -2;
+          velocity_y = 0;
+          y = maze.snap_y(y+8);
+          switch_animation(*current_animation, pacman_left);
+          current_animation = &pacman_left;
+          direction = LEFT;
+        }
       break;
 
     default:
@@ -132,43 +133,43 @@ Pacman::handle_collisions(Maze &maze)
   if (direction == RIGHT)
     {
       if (maze.item_at(x+16, y+8) == TileType::WALL)
-	{
-	  velocity_x = 0;
-	  x = maze.snap_x(x);
-	  pause_animation(*current_animation);
-	}
+        {
+          velocity_x = 0;
+          x = maze.snap_x(x);
+          pause_animation(*current_animation);
+        }
     }
 
   // Left Side
   if (direction == LEFT)
     {
       if (maze.item_at(x, y+8) == TileType::WALL)
-	{
-	  velocity_x = 0;
-	  x = maze.snap_x(x+8);
-	  pause_animation(*current_animation);
-	}
+        {
+          velocity_x = 0;
+          x = maze.snap_x(x+8);
+          pause_animation(*current_animation);
+        }
     }
 
   // Top Side
   if (direction == UP)
     {
       if (maze.item_at(x+8, y) == TileType::WALL)
-	{
-	  velocity_y = 0;
-	  y = maze.snap_y(y+4);
-	  pause_animation(*current_animation);
-	}
+        {
+          velocity_y = 0;
+          y = maze.snap_y(y+4);
+          pause_animation(*current_animation);
+        }
     }
 
   // Bottom Side
   if (direction == DOWN)
     {
       if (maze.item_at(x+8, y+16) == TileType::WALL)
-	{
-	  velocity_y = 0;
-	  pause_animation(*current_animation);
-	  y = maze.snap_y(y+8);
-	}
+        {
+          velocity_y = 0;
+          pause_animation(*current_animation);
+          y = maze.snap_y(y+8);
+        }
     }
 }

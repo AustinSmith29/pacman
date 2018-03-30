@@ -10,18 +10,72 @@ ChaseFunction::red_ghost(Ghost &ghost, Maze &maze, AIState &state)
 void
 ChaseFunction::blue_ghost(Ghost &ghost, Maze &maze, AIState &state)
 {
-
+  int target_x, target_y;
+  if (state.pacman_direction == UP)
+    {
+      target_x = state.pacman_x;
+      target_y = state.pacman_y - (4 * TILE_SIZE);
+    }
+  else if (state.pacman_direction == RIGHT)
+    {
+      target_x = state.pacman_x + (4 * TILE_SIZE);
+      target_y = state.pacman_y;
+    }
+  else if (state.pacman_direction == DOWN)
+    {
+      target_x = state.pacman_x;
+      target_y = state.pacman_y + (4 * TILE_SIZE);
+    }
+  else
+    {
+      target_x = state.pacman_x - (4 * TILE_SIZE);
+      target_y = state.pacman_y;
+    }
+  ghost.go_to(target_x, target_y, maze);
 }
 
 void
 ChaseFunction::pink_ghost(Ghost &ghost, Maze &maze, AIState &state)
 {
-
+  int target_x, target_y;
+  if (state.pacman_direction == UP)
+    {
+      target_x = state.pacman_x;
+      target_y = state.pacman_y + (4 * TILE_SIZE);
+    }
+  else if (state.pacman_direction == RIGHT)
+    {
+      target_x = state.pacman_x - (4 * TILE_SIZE);
+      target_y = state.pacman_y;
+    }
+  else if (state.pacman_direction == DOWN)
+    {
+      target_x = state.pacman_x;
+      target_y = state.pacman_y - (4 * TILE_SIZE);
+    }
+  else
+    {
+      target_x = state.pacman_x + (4 * TILE_SIZE);
+      target_y = state.pacman_y;
+    }
+  ghost.go_to(target_x, target_y, maze);
 }
 
 void
 ChaseFunction::orange_ghost(Ghost &ghost, Maze &maze, AIState &state)
 {
+  int dx = ghost.x - state.pacman_x;
+  int dy = ghost.y - state.pacman_y;
+  int distance = (int)sqrt(pow(dx, 2) + pow(dy, 2));
+
+  if (distance > 8)
+    {
+      ghost.go_to(state.pacman_x, state.pacman_y, maze);
+    }
+  else
+    {
+      ghost.go_to(ghost.scatter_x, ghost.scatter_y, maze);
+    }
 }
 
 void
