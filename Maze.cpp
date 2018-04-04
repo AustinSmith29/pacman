@@ -168,14 +168,6 @@ Maze::draw(SDL_Renderer *renderer)
     {
       for (int x = 0; x < MAZE_WIDTH; x++)
         {
-          /*
-          SDL_Rect tile_bounds {
-            (x*TILE_SIZE) + x_offset,
-              (y*TILE_SIZE) + y_offset,
-              TILE_SIZE,
-              TILE_SIZE
-              };
-          */
           int screen_x = (x * TILE_SIZE) + x_offset;
           int screen_y = (y * TILE_SIZE) + y_offset;
           auto c = std::make_pair(x,y);
@@ -189,35 +181,6 @@ Maze::draw(SDL_Renderer *renderer)
             {
               continue;
             }
-          /*
-          if (tiles[c].type == TileType::WALL)
-            {
-              SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-              SDL_RenderDrawRect(renderer, &tile_bounds);
-            }
-          if (tiles[c].type == TileType::DOT)
-            {
-              SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-              // Obviously a temporary solution until tiles.
-              SDL_Rect dot {
-                tile_bounds.x + 6,
-                  tile_bounds.y + 6,
-                  4, 4
-                  };
-		  
-              SDL_RenderDrawRect(renderer, &dot);
-            }
-          if (tiles[c].type == TileType::BIGDOT)
-            {
-              SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-              SDL_Rect bigdot {
-                tile_bounds.x + 4,
-                  tile_bounds.y + 4,
-                  8, 8
-                  };
-              SDL_RenderDrawRect(renderer, &bigdot);
-            }
-          */
         }
     }
 }
