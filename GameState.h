@@ -8,6 +8,9 @@
 #include "Pacman.h"
 #include "Ghost.h"
 
+#include <vector>
+#include <memory>
+
 class GameState : public State
 {
  public:
@@ -24,9 +27,6 @@ class GameState : public State
   Pacman pacman;
   Sprite maze;
   Maze maze_obj;
-  Ghost test_bitch;
-  Ghost test_bitch2;
-  Ghost test_bitch3;
-  Ghost test_bitch4;
+  std::vector<std::unique_ptr<Ghost>> ghosts;
 };
 #endif

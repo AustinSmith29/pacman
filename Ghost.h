@@ -3,9 +3,10 @@
 
 #include "Graphics.h"
 #include "Maze.h"
+#include "Timer.h"
 
 #include <functional>
-
+#include <memory>
 
 #define SCARED_SPEED 1
 
@@ -45,14 +46,18 @@ class ChaseFunction
   ChaseFunction() { }
 };
 
-enum GhostState {CHASE, SCATTER, SCARED};
+enum GhostState { CHASE, SCATTER, SCARED };
+enum GhostType { RED, BLUE, ORANGE, PINK };
 
 class Ghost
 {
  public:
-  void init(GraphicsLoader *loader, int x, int y,
-            std::function<void(Ghost&, Maze&, AIState&)> chase,
-            int scat_x, int scat_y);
+  friend Ghost ghost_factory(GhostType type, GraphicsLoader *loader);
+
+  Ghost(int scatter_x, int scatter_y,
+        std::function<void(Ghost&, Maze&, AIState&)> chase);
+
+  void init(GraphicsLoader *loader, std::string sprite_filepath, int x, int y);
 
   /** Performs the logic for the ghost depending on its state. **/
   void update(Maze &maze, AIState &state); 
@@ -75,14 +80,20 @@ class Ghost
   int speed;
   int current_speed;          /// speed changes when ghost becomes scared.
   Sprite sprite;
+  Sprite scared_sprite;
+  Sprite *current_sprite;
   GhostState current_state;
-  int path_timer;             /// When path_ticks > path_timer recalculate path.
-  int path_ticks;
   bool has_path;
   std::stack<std::pair<int,int>> path;
   /// Each ghost chases pacman using a unique method.
   std::function<void(Ghost&, Maze&, AIState&)> chase; 
+  Timer scatter_timer;
+  Timer scared_timer; 
+  Timer path_timer;
+  Timer ghost_house_timer;
 
   friend class ChaseFunction;
 };
+
+std::unique_ptr<Ghost> ghost_factory(GraphicsLoader *loader, GhostType type);
 #endif

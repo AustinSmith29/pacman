@@ -66,6 +66,15 @@ Maze::Maze()
 }
 
 void
+Maze::init(GraphicsLoader *loader)
+{
+  tile_sprites[TileType::DOT]    = loader->load_sprite("assets/imgs/dot.bmp");
+  tile_sprites[TileType::BIGDOT] = loader->load_sprite("assets/imgs/powerdot.bmp");
+  tile_sprites[TileType::WALL]   = loader->load_sprite("assets/imgs/wall.bmp");
+  tile_sprites[TileType::GATE]   = loader->load_sprite("assets/imgs/gate.bmp");
+}
+
+void
 Maze::reset()
 {
   srand(time(NULL));
@@ -86,6 +95,9 @@ Maze::reset()
               break;
             case TileType::BIGDOT:
               tiles[coord] = Tile(x, y, TileType::BIGDOT);
+              break;
+            case TileType::GATE:
+              tiles[coord] = Tile(x, y, TileType::GATE);
               break;
             default:
               tiles[coord] = Tile(x, y, TileType::OPEN);
@@ -156,14 +168,28 @@ Maze::draw(SDL_Renderer *renderer)
     {
       for (int x = 0; x < MAZE_WIDTH; x++)
         {
+          /*
           SDL_Rect tile_bounds {
             (x*TILE_SIZE) + x_offset,
               (y*TILE_SIZE) + y_offset,
               TILE_SIZE,
               TILE_SIZE
               };
+          */
+          int screen_x = (x * TILE_SIZE) + x_offset;
+          int screen_y = (y * TILE_SIZE) + y_offset;
           auto c = std::make_pair(x,y);
 
+          if (tile_sprites.find(tiles[c].type) != tile_sprites.end())
+            {
+              draw_sprite(renderer, tile_sprites[tiles[c].type],
+                          screen_x, screen_y);
+            }
+          else
+            {
+              continue;
+            }
+          /*
           if (tiles[c].type == TileType::WALL)
             {
               SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
@@ -191,6 +217,7 @@ Maze::draw(SDL_Renderer *renderer)
                   };
               SDL_RenderDrawRect(renderer, &bigdot);
             }
+          */
         }
     }
 }

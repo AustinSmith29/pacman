@@ -2,8 +2,7 @@
  *  @brief Contains the definition for the maze that pacman/ghosts navigate.
  *
  *  @author Austin Smith
- *  @bugs Moving Left/Down/Right/Down/Left/Down/Right/Down causes Segfault.
- *  Segfault is suspected to be caused in dijiskstra/get_path. 
+ *  @bugs None that are known.
  **/
 
 #ifndef _MAZE_H
@@ -30,11 +29,6 @@ enum TileType
     TUNNEL,
     GATE,
     JUNCTION,
-    CHERRY,
-    STRAWBERRY,
-    ORANGE,
-    APPLE,
-    MELON,
     UNKNOWN
   };
 
@@ -50,6 +44,8 @@ class Maze
 {
  public:
   Maze();
+
+  void init(GraphicsLoader *loader);
 
   friend std::stack<cell> dikstra(int target_x, int target_y,
 				  int from_x, int from_y, Maze &maze);
@@ -104,7 +100,7 @@ class Maze
   void draw(SDL_Renderer *renderer);
 
  private:
-  Sprite tile_sprites[10];
+  std::map<TileType, Sprite> tile_sprites;
   std::map<cell, Tile> tiles;
   std::map<cell, std::vector<cell>> neighbors; /// cell --> vector of surrounding cells
   int x_offset, y_offset;  /// screen_location of top-left corner of maze
