@@ -81,7 +81,7 @@ ChaseFunction::orange_ghost(Ghost &ghost, Maze &maze, AIState &state)
 
 Ghost::Ghost(int scatter_x, int scatter_y,
              std::function<void(Ghost&, Maze&, AIState&)> chase)
-  : scatter_timer(100), path_timer(100), ghost_house_timer(500), scared_timer(500)
+  : scatter_timer(100), path_timer(100), ghost_house_timer(200), scared_timer(500)
 {
   this->scatter_x = scatter_x;
   this->scatter_y = scatter_y;
@@ -99,9 +99,11 @@ Ghost::init(GraphicsLoader *loader, std::string sprite_filepath, int x, int y)
   this->current_speed = speed;
   this->has_path = false;
   current_sprite = &this->sprite;
-  set_state(GhostState::SCATTER);
+  can_pass_gate = false;
+  set_state(GhostState::HOUSE);
 }
 
+// TODO: Break this function up into seperate functions.
 void
 Ghost::update(Maze &maze, AIState &state)
 {
@@ -142,6 +144,32 @@ Ghost::update(Maze &maze, AIState &state)
         }
       scared_timer.tick();
       break;
+    case EATEN:
+      break;
+    case HOUSE:
+      if (ghost_house_timer.finished())
+        {
+          std::cout << "Ghost House Timer expired!\n";
+          const int MAZE_EXIT_X = 326;
+          const int MAZE_EXIT_Y = 176;
+          can_pass_gate = true;
+          set_state(GhostState::LEAVE_HOUSE);
+          go_to(MAZE_EXIT_X, MAZE_EXIT_Y, maze, can_pass_gate);
+        }
+      else
+        {
+          ghost_house_timer.tick();
+        }
+      break;
+    case LEAVE_HOUSE:
+      // Finished going to maze exit
+      if (!has_path)
+        {
+          std::cout << "DONE!\n";
+          can_pass_gate = false;
+          set_state(GhostState::SCATTER);
+          break;
+        }
     }
 
   if (!path.empty())
@@ -179,9 +207,9 @@ Ghost::update(Maze &maze, AIState &state)
 }
 
 void
-Ghost::go_to(int tx, int ty, Maze &maze)
+Ghost::go_to(int tx, int ty, Maze &maze, bool can_pass_gate)
 {
-  path = dikstra(tx, ty, x, y, maze);
+  path = dikstra(tx, ty, x, y, maze, can_pass_gate);
   has_path = true;
   path_timer.reset();
 }
@@ -231,6 +259,7 @@ std::unique_ptr<Ghost> ghost_factory(GraphicsLoader *loader, GhostType type)
       {
         ghost = std::make_unique<Ghost>(550, 16, ChaseFunction::red_ghost);
         ghost->init(loader, "assets/imgs/red_ghost.bmp", 318, 192);
+        ghost->set_state(GhostState::SCATTER); // red ghost starts outside ghosthouse
         return ghost;
       }
     case BLUE:
@@ -248,7 +277,7 @@ std::unique_ptr<Ghost> ghost_factory(GraphicsLoader *loader, GhostType type)
     case PINK:
       {
         ghost = std::make_unique<Ghost>(118, 16, ChaseFunction::pink_ghost);
-        ghost->init(loader, "assets/imgs/pink_ghost.bmp", 328, 224);
+        ghost->init(loader, "assets/imgs/pink_ghost.bmp", 345, 224);
         return ghost;
       }
     defualt:
