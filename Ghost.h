@@ -46,7 +46,7 @@ class ChaseFunction
   ChaseFunction() { }
 };
 
-enum GhostState { CHASE, SCATTER, SCARED };
+enum GhostState { CHASE, SCATTER, SCARED, EATEN, HOUSE, LEAVE_HOUSE };
 enum GhostType { RED, BLUE, ORANGE, PINK };
 
 class Ghost
@@ -57,7 +57,8 @@ class Ghost
   Ghost(int scatter_x, int scatter_y,
         std::function<void(Ghost&, Maze&, AIState&)> chase);
 
-  void init(GraphicsLoader *loader, std::string sprite_filepath, int x, int y);
+  void init(GraphicsLoader *loader, std::string sprite_filepath, int x, int y,
+            int house_time);
 
   /** Performs the logic for the ghost depending on its state. **/
   void update(Maze &maze, AIState &state); 
@@ -68,7 +69,7 @@ class Ghost
    * @param x the target x screen coordinate
    * @param y the target y screen coordinate
    **/
-  void go_to(int x, int y, Maze &maze);
+  void go_to(int x, int y, Maze &maze, bool can_pass_gate=false);
 
   void set_state(GhostState new_state);
 
@@ -91,6 +92,7 @@ class Ghost
   Timer scared_timer; 
   Timer path_timer;
   Timer ghost_house_timer;
+  bool can_pass_gate;
 
   friend class ChaseFunction;
 };

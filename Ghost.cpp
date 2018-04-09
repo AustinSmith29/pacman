@@ -81,7 +81,7 @@ ChaseFunction::orange_ghost(Ghost &ghost, Maze &maze, AIState &state)
 
 Ghost::Ghost(int scatter_x, int scatter_y,
              std::function<void(Ghost&, Maze&, AIState&)> chase)
-  : scatter_timer(100), path_timer(100), ghost_house_timer(200), scared_timer(500)
+  : scatter_timer(100), path_timer(100), ghost_house_timer(0), scared_timer(500)
 {
   this->scatter_x = scatter_x;
   this->scatter_y = scatter_y;
@@ -89,7 +89,8 @@ Ghost::Ghost(int scatter_x, int scatter_y,
 }
 
 void
-Ghost::init(GraphicsLoader *loader, std::string sprite_filepath, int x, int y)
+Ghost::init(GraphicsLoader *loader, std::string sprite_filepath, int x, int y,
+            int house_time)
 {
   this->x = x;
   this->y = y;
@@ -100,6 +101,7 @@ Ghost::init(GraphicsLoader *loader, std::string sprite_filepath, int x, int y)
   this->has_path = false;
   current_sprite = &this->sprite;
   can_pass_gate = false;
+  ghost_house_timer.set(house_time);
   set_state(GhostState::HOUSE);
 }
 
@@ -224,6 +226,10 @@ Ghost::set_state(GhostState new_state)
       current_sprite = &scared_sprite;
       scared_timer.reset();
     }
+  else if (new_state == GhostState::LEAVE_HOUSE)
+    {
+      current_speed = SCARED_SPEED;
+    }
   else
     {
       current_speed = speed;
@@ -258,26 +264,26 @@ std::unique_ptr<Ghost> ghost_factory(GraphicsLoader *loader, GhostType type)
     case RED:
       {
         ghost = std::make_unique<Ghost>(550, 16, ChaseFunction::red_ghost);
-        ghost->init(loader, "assets/imgs/red_ghost.bmp", 318, 192);
+        ghost->init(loader, "assets/imgs/red_ghost.bmp", 318, 192, 0);
         ghost->set_state(GhostState::SCATTER); // red ghost starts outside ghosthouse
         return ghost;
       }
     case BLUE:
       {
         ghost = std::make_unique<Ghost>(550, 480, ChaseFunction::blue_ghost);
-        ghost->init(loader, "assets/imgs/blue_ghost.bmp", 295, 224);
+        ghost->init(loader, "assets/imgs/blue_ghost.bmp", 295, 224, 250);
         return ghost;
       }
     case ORANGE:
       {
         ghost = std::make_unique<Ghost>(118, 480, ChaseFunction::orange_ghost);
-        ghost->init(loader, "assets/imgs/orange_ghost.bmp", 318, 224);
+        ghost->init(loader, "assets/imgs/orange_ghost.bmp", 318, 224, 350);
         return ghost;
       }
     case PINK:
       {
         ghost = std::make_unique<Ghost>(118, 16, ChaseFunction::pink_ghost);
-        ghost->init(loader, "assets/imgs/pink_ghost.bmp", 345, 224);
+        ghost->init(loader, "assets/imgs/pink_ghost.bmp", 345, 224, 450);
         return ghost;
       }
     defualt:
