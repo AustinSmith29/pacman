@@ -96,6 +96,7 @@ Ghost::init(GraphicsLoader *loader, std::string sprite_filepath, int x, int y,
   this->y = y;
   this->sprite = loader->load_sprite(sprite_filepath);
   this->scared_sprite = loader->load_sprite("assets/imgs/scared_ghost.bmp");
+  this->eyes_sprite = loader->load_sprite("assets/imgs/ghost_eyes.bmp");
   this->speed = 2;
   this->current_speed = speed;
   this->has_path = false;
@@ -105,80 +106,126 @@ Ghost::init(GraphicsLoader *loader, std::string sprite_filepath, int x, int y,
   set_state(GhostState::HOUSE);
 }
 
-// TODO: Break this function up into seperate functions.
+int
+Ghost::get_x()
+{
+  return x;
+}
+
+int
+Ghost::get_y()
+{
+  return y;
+}
+
+bool
+Ghost::is_eatable()
+{
+  return current_state == GhostState::SCARED;
+}
+
 void
 Ghost::update(Maze &maze, AIState &state)
 {
-  int target_x = 0;
-  int target_y = 0;
-  switch(current_state)
-    {
-    case CHASE:
-      if (!has_path || path_timer.finished())
-        {
-          chase(*this, maze, state);
-        }
-      break;
-    case SCATTER:
-      if (scatter_timer.finished())
-        {
-          std::cout << "Scatter Timer expired!\n";
-          set_state(GhostState::CHASE);
-          break;
-        }
-      if (!has_path || path_timer.finished())
-        {
-          go_to(scatter_x, scatter_y, maze);
-        }
-      scatter_timer.tick();
-      break;
-    case SCARED:
-      if (scared_timer.finished())
-        {
-          std::cout << "Scared Timer expired!\n";
-          set_state(GhostState::CHASE);
-          break;
-        }
-      if (!has_path || path_timer.finished())
-        {
-          cell random_cell = maze.random_cell();
-          go_to(random_cell.first, random_cell.second, maze);
-        }
-      scared_timer.tick();
-      break;
-    case EATEN:
-      break;
-    case HOUSE:
-      if (ghost_house_timer.finished())
-        {
-          std::cout << "Ghost House Timer expired!\n";
-          const int MAZE_EXIT_X = 326;
-          const int MAZE_EXIT_Y = 176;
-          can_pass_gate = true;
-          set_state(GhostState::LEAVE_HOUSE);
-          go_to(MAZE_EXIT_X, MAZE_EXIT_Y, maze, can_pass_gate);
-        }
-      else
-        {
-          ghost_house_timer.tick();
-        }
-      break;
-    case LEAVE_HOUSE:
-      // Finished going to maze exit
-      if (!has_path)
-        {
-          std::cout << "DONE!\n";
-          can_pass_gate = false;
-          set_state(GhostState::SCATTER);
-          break;
-        }
-    }
+  state_logic(maze, state);
+  follow_path();
+}
 
+void
+Ghost::chase_state(Maze &maze, AIState &state)
+{
+  if (!has_path || path_timer.finished())
+    {
+      chase(*this, maze, state);
+    }
+}
+
+void
+Ghost::scatter_state(Maze &maze, AIState &state)
+{
+  if (scatter_timer.finished())
+    {
+      std::cout << "Scatter Timer expired!\n";
+      set_state(GhostState::CHASE);
+    }
+  if (!has_path || path_timer.finished())
+    {
+      go_to(scatter_x, scatter_y, maze);
+    }
+  scatter_timer.tick();
+}
+
+void
+Ghost::scared_state(Maze &maze, AIState &state)
+{
+  if (scared_timer.finished())
+    {
+      std::cout << "Scared Timer expired!\n";
+      set_state(GhostState::CHASE);
+    }
+  if (!has_path || path_timer.finished())
+    {
+      cell random_cell = maze.random_cell();
+      go_to(random_cell.first, random_cell.second, maze);
+    }
+  scared_timer.tick();
+}
+
+void
+Ghost::eaten_state(Maze &maze, AIState &state)
+{
+  set_state(GhostState::RETURN);
+  go_to(318, 224, maze, true);
+}
+
+void
+Ghost::return_state(Maze &maze, AIState &state)
+{
+  if (!has_path)
+    {
+      set_state(GhostState::HOUSE);
+      ghost_house_timer.set(200);
+      ghost_house_timer.reset();
+    }
+}
+
+void
+Ghost::house_state(Maze &maze, AIState &state)
+{
+  if (ghost_house_timer.finished())
+    {
+      std::cout << "Ghost House Timer expired!\n";
+      const int MAZE_EXIT_X = 326;
+      const int MAZE_EXIT_Y = 176;
+      can_pass_gate = true;
+      set_state(GhostState::LEAVE_HOUSE);
+      go_to(MAZE_EXIT_X, MAZE_EXIT_Y, maze, can_pass_gate);
+    }
+  else
+    {
+      ghost_house_timer.tick();
+    }
+}
+
+void
+Ghost::leave_house_state(Maze &maze, AIState &state)
+{
+  // Finished going to maze exit
+  if (!has_path)
+    {
+      can_pass_gate = false;
+      set_state(GhostState::SCATTER);
+    }
+}
+
+void
+Ghost::follow_path()
+{
   if (!path.empty())
     {
       auto coord = path.top();
-      target_x = coord.first;
-      target_y = coord.second;
+      int target_x = coord.first;
+      int target_y = coord.second;
       // Following hack solves "jittery" problem that often occurs on state
       // transitions. The ghost jumps back and forth from point to point because
       // the position never quite equals target coords. Ex: Target_x = 10,
@@ -186,7 +233,7 @@ Ghost::update(Maze &maze, AIState &state)
       // jump back, only to jump back yet again. Rinse Recycle Repeat.
       // Maybe fix by checking the grid cell... but then we will have to check for
       // intersections so ghosts don't change direction prematurely.
-      if (abs(x - target_x) < 4 && abs(y - target_y) < 4) // HACK
+      if (abs(x - target_x) <= current_speed && abs(y - target_y) <= current_speed) 
         {
           path.pop();
         }
@@ -194,11 +241,11 @@ Ghost::update(Maze &maze, AIState &state)
       int dy = target_y - y;
       if (dx < 0)
         x -= current_speed;
-      if (dx > 0)
+      else if (dx > 0)
         x += current_speed;
-      if (dy < 0)
+      else if (dy < 0)
         y -= current_speed;
-      if (dy > 0)
+      else if (dy > 0)
         y += current_speed;
     }
   else
@@ -219,35 +266,56 @@ Ghost::go_to(int tx, int ty, Maze &maze, bool can_pass_gate)
 void
 Ghost::set_state(GhostState new_state)
 {
-  // TODO: Make this a switch statement
-  if (new_state == GhostState::SCARED)
+  using namespace std::placeholders;
+  switch(new_state)
     {
+    case SCATTER:
+      current_speed = speed;
+      current_sprite = &sprite;
+      scatter_timer.reset();
+      state_logic = std::bind(&Ghost::scatter_state, this, _1, _2);
+      break;
+
+    case CHASE:
+      current_speed = speed;
+      current_sprite = &sprite;
+      state_logic = std::bind(&Ghost::chase_state, this, _1, _2);
+      break;
+
+    case SCARED:
       current_speed = SCARED_SPEED;
       current_sprite = &scared_sprite;
       scared_timer.reset();
-    }
-  else if (new_state == GhostState::LEAVE_HOUSE)
-    {
-      current_speed = SCARED_SPEED;
-    }
-  else
-    {
-      current_speed = speed;
+      state_logic = std::bind(&Ghost::scared_state, this, _1, _2);
+      break;
+
+    case EATEN: 
+      state_logic = std::bind(&Ghost::eaten_state, this, _1, _2);
+      break;
+
+    case RETURN:
+      current_speed = RETURN_SPEED;
+      current_sprite = &eyes_sprite;
+      state_logic = std::bind(&Ghost::return_state, this, _1, _2);
+      break;
+
+    case HOUSE:
       current_sprite = &sprite;
-    }
+      ghost_house_timer.reset();
+      state_logic = std::bind(&Ghost::house_state, this, _1, _2);
+      break;
 
-  if (new_state == GhostState::SCATTER)
-    {
-      scatter_timer.reset();
-    }
+    case LEAVE_HOUSE:
+      current_speed = SCARED_SPEED;
+      state_logic = std::bind(&Ghost::leave_house_state, this, _1, _2);
+      break;
 
-  if (new_state == GhostState::SCARED)
-    {
-      scared_timer.reset();
+    default:
+      std::cout << "UNKNOWN STATE\n";
+      break;
     }
-
-  has_path = false;
   current_state = new_state;
+  has_path = false;
 }
 
 void
@@ -271,22 +339,22 @@ std::unique_ptr<Ghost> ghost_factory(GraphicsLoader *loader, GhostType type)
     case BLUE:
       {
         ghost = std::make_unique<Ghost>(550, 480, ChaseFunction::blue_ghost);
-        ghost->init(loader, "assets/imgs/blue_ghost.bmp", 295, 224, 250);
+        ghost->init(loader, "assets/imgs/blue_ghost.bmp", 295, 224, 50);
         return ghost;
       }
     case ORANGE:
       {
         ghost = std::make_unique<Ghost>(118, 480, ChaseFunction::orange_ghost);
-        ghost->init(loader, "assets/imgs/orange_ghost.bmp", 318, 224, 350);
+        ghost->init(loader, "assets/imgs/orange_ghost.bmp", 318, 224, 100);
         return ghost;
       }
     case PINK:
       {
         ghost = std::make_unique<Ghost>(118, 16, ChaseFunction::pink_ghost);
-        ghost->init(loader, "assets/imgs/pink_ghost.bmp", 345, 224, 450);
+        ghost->init(loader, "assets/imgs/pink_ghost.bmp", 345, 224, 150);
         return ghost;
       }
-    defualt:
+    default:
       throw std::runtime_error("Unknown ghost type.");
     }
   return nullptr;

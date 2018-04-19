@@ -48,6 +48,20 @@ GameState::update_logic()
   for (int i = 0; i < ghosts.size(); i++)
     {
       ghosts[i]->update(maze_obj, state);
+      if (ghosts[i]->is_eatable())
+        {
+          int ghost_x = ghosts[i]->get_x();
+          int ghost_y = ghosts[i]->get_y();
+          maze_obj.screen_to_grid(ghost_x, ghost_y);
+          int pac_x = px;
+          int pac_y = py;
+          maze_obj.screen_to_grid(pac_x, pac_y);
+          if (pac_x == ghost_x && pac_y == ghost_y)
+            {
+              ghosts[i]->set_state(GhostState::EATEN);
+            }
+        }
+
     }
 
   if (maze_obj.item_at(px, py) == TileType::DOT)
@@ -58,20 +72,30 @@ GameState::update_logic()
   if (maze_obj.item_at(px, py) == TileType::BIGDOT)
     {
       maze_obj.remove_at(px, py);
+      // replace with for_each
       for (int i = 0; i < ghosts.size(); i++)
         {
           ghosts[i]->set_state(GhostState::SCARED);
         }
+    }
+
+  if (maze_obj.pass_tunnel_right(px, py))
+    {
+      pacman.tunnel_right();
+    }
+  else if (maze_obj.pass_tunnel_left(px, py))
+    {
+      pacman.tunnel_left();
     }
 }
 
 void 
 GameState::draw(SDL_Renderer *renderer)
 {
+  pacman.draw(renderer); // pacman drawn first cuz of side tunnel hack.
   maze_obj.draw(renderer);
   for (int i = 0; i < ghosts.size(); i++)
     {
       ghosts[i]->draw(renderer);
     }
-  pacman.draw(renderer);
 }

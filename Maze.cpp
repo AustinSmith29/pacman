@@ -99,6 +99,9 @@ Maze::reset()
             case TileType::GATE:
               tiles[coord] = Tile(x, y, TileType::GATE);
               break;
+            case TileType::TUNNEL:
+              tiles[coord] = Tile(x, y, TileType::TUNNEL);
+              break;
             default:
               tiles[coord] = Tile(x, y, TileType::OPEN);
               break;
@@ -161,6 +164,18 @@ Maze::random_cell()
   return std::make_pair(x, y);
 }
 
+bool
+Maze::pass_tunnel_left(int x, int y)
+{
+  return x < x_offset - 16;
+}
+
+bool
+Maze::pass_tunnel_right(int x, int y)
+{
+  return x > (MAZE_WIDTH * TILE_SIZE) + x_offset + 16;
+}
+
 void
 Maze::draw(SDL_Renderer *renderer)
 {
@@ -183,6 +198,13 @@ Maze::draw(SDL_Renderer *renderer)
             }
         }
     }
+  // Hide pacman behind solid rect as he moves off the maze "into" the tunnel.
+  SDL_Rect left_tunnel_mask = {0, 0, x_offset, MAZE_HEIGHT * TILE_SIZE };
+  SDL_Rect right_tunnel_mask = {(MAZE_WIDTH * TILE_SIZE) + x_offset, 0, 2*TILE_SIZE,
+                                (MAZE_HEIGHT * TILE_SIZE)};
+  SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+  SDL_RenderFillRect(renderer, &left_tunnel_mask);
+  SDL_RenderFillRect(renderer, &right_tunnel_mask);
 }
 
 bool
@@ -214,9 +236,10 @@ Maze::get_neighbors(cell at)
   auto left = tiles.find(std::make_pair(at.first-1, at.second));
 
   auto add_empty = [this, &passable_cells](decltype(top) cell_iter) -> void {
-    if (cell_iter != tiles.end() && tiles.find(cell_iter->first)->second.type != TileType::WALL)
+    if (cell_iter != tiles.end() && tiles.find(cell_iter->first)->second.type != TileType::WALL && 
+        tiles.find(cell_iter->first)->second.type != TileType::TUNNEL)
       {
-	passable_cells.push_back(cell_iter->first);
+        passable_cells.push_back(cell_iter->first);
       }
   };
 
@@ -276,8 +299,9 @@ static cell apply_heuristic(std::vector<cell> candidates, std::vector<cell> visi
 }
 
 std::stack<cell> dikstra(int target_x, int target_y,
-			 int from_x, int from_y,
-			 Maze &maze)
+                         int from_x, int from_y,
+                         Maze &maze,
+                         bool can_pass_gate=false)
 {
   maze.screen_to_grid(target_x, target_y);
   maze.screen_to_grid(from_x, from_y);
@@ -303,7 +327,7 @@ std::stack<cell> dikstra(int target_x, int target_y,
   auto cmp = [distances](cell a, cell b) -> bool {
     return distances.find(a)->second > distances.find(b)->second;
   };
-  
+
   std::priority_queue<cell, std::vector<cell>, decltype(cmp)> nodes(cmp);
   std::vector<cell> visited;
   std::map<cell, cell> parent;
@@ -318,12 +342,18 @@ std::stack<cell> dikstra(int target_x, int target_y,
 
       // Select next best cell.
       auto candidates = maze.neighbors[current_cell];
+      for (int i = 0; i < candidates.size(); i++)
+        {
+          if (!can_pass_gate && maze.tiles[candidates[i]].type == TileType::GATE)
+            {
+              candidates.erase(candidates.begin() + i);
+            }
+        }
       // Hack for right now... look up A* to see how to deal with this.
       if (candidates.size() == 0)
         break;
       cell next_cell = apply_heuristic(candidates, visited, target_cell);
       parent[next_cell] = current_cell;
-      
       nodes.push(next_cell);
     }
   // TEST: change target_cell to last visited cell since this isn't really a true dijikstra algorithm,

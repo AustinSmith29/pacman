@@ -9,6 +9,7 @@
 #include <memory>
 
 #define SCARED_SPEED 1
+#define RETURN_SPEED 4
 
 /**
  * AIState contains information that is important for Ghost path calculations.
@@ -46,7 +47,7 @@ class ChaseFunction
   ChaseFunction() { }
 };
 
-enum GhostState { CHASE, SCATTER, SCARED, EATEN, HOUSE, LEAVE_HOUSE };
+enum GhostState { CHASE, SCATTER, SCARED, EATEN, RETURN, HOUSE, LEAVE_HOUSE };
 enum GhostType { RED, BLUE, ORANGE, PINK };
 
 class Ghost
@@ -59,6 +60,10 @@ class Ghost
 
   void init(GraphicsLoader *loader, std::string sprite_filepath, int x, int y,
             int house_time);
+
+  int get_x();
+  int get_y();
+  bool is_eatable();
 
   /** Performs the logic for the ghost depending on its state. **/
   void update(Maze &maze, AIState &state); 
@@ -82,6 +87,7 @@ class Ghost
   int current_speed;          /// speed changes when ghost becomes scared.
   Sprite sprite;
   Sprite scared_sprite;
+  Sprite eyes_sprite;
   Sprite *current_sprite;
   GhostState current_state;
   bool has_path;
@@ -93,6 +99,16 @@ class Ghost
   Timer path_timer;
   Timer ghost_house_timer;
   bool can_pass_gate;
+
+  void chase_state(Maze &maze, AIState &state);
+  void scatter_state(Maze &maze, AIState &state);
+  void scared_state(Maze &maze, AIState &state);
+  void eaten_state(Maze &maze, AIState &state);
+  void return_state(Maze &maze, AIState &state);
+  void house_state(Maze &maze, AIState &state);
+  void leave_house_state(Maze &maze, AIState &state);
+  std::function<void(Maze&, AIState&)> state_logic;
+  void follow_path();
 
   friend class ChaseFunction;
 };
