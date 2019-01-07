@@ -24,7 +24,7 @@ GraphicsLoader::load_sprite(std::string filepath)
       Sprite new_sprite = std::make_unique<_Sprite>(texture);
       return new_sprite;
     }
-  
+
   // Else load it for first time.
   SDL_Surface *surface = SDL_LoadBMP(filepath.c_str());
   if (!surface)
@@ -39,7 +39,7 @@ GraphicsLoader::load_sprite(std::string filepath)
       std::cout << SDL_GetError() << std::endl;
       return nullptr;
     }
-  
+
   SDL_FreeSurface(surface);
   registry[filepath] = std::shared_ptr<SDL_Texture>(texture,
 						    [](SDL_Texture *t)
@@ -112,7 +112,7 @@ GraphicsLoader::make_animation_from_sheet(std::string filepath,
       animation->frames.push_back(frame);
       x += dx;  // Only moves linearly to the right for next frame.
     }
-  
+
   return animation;
 }
 
@@ -154,7 +154,7 @@ void draw_single_frame_animation(SDL_Renderer *renderer, Animation &a, int x, in
       rect.w = 0;
       rect.h = 0;
     }
-  
+
   SDL_RenderCopy(renderer, a->sheet->texture.get(), &(a->frames[a->current_frame]), &rect);
 }
 
@@ -196,4 +196,12 @@ void pause_animation(Animation &animation)
 void unpause_animation(Animation &animation)
 {
   animation->paused = false;
+}
+
+bool is_animation_complete(Animation &animation)
+{
+  size_t frames = animation->frames.size();
+  if (animation->current_frame == frames - 1)
+    return true;
+  return false;
 }

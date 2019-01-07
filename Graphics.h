@@ -1,7 +1,7 @@
 /** @file Graphics.h
- *  @brief Definitions used to handle graphics. 
+ *  @brief Definitions used to handle graphics.
  *
- *  This contains the objects that will be used to draw sprites and animations 
+ *  This contains the objects that will be used to draw sprites and animations
  *  to the screen.
  *
  *  @author Austin Smith
@@ -17,7 +17,7 @@
 #include <vector>
 #include <map>
 
-/** 
+/**
  * _Sprite
  * A _Sprite wraps the functionality of a SDL_Texture. They are the
  * images that can be drawn on the screen.
@@ -122,10 +122,11 @@ void draw_sprite(SDL_Renderer *renderer, Sprite &sprite, int x, int y);
 
 void play_animation(SDL_Renderer *renderer, Animation &animation, int x, int y);
 
-/** 
+/**
  * Pauses old animation and unpauses new_anim.
  **/
 void switch_animation(Animation &old_anim, Animation &new_anim);
 void pause_animation(Animation &animation);
 void unpause_animation(Animation &animation);
+bool is_animation_complete(Animation &animation);
 #endif

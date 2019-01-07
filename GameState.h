@@ -25,8 +25,9 @@ class GameState : public State
  private:
   Input input;
   Pacman pacman;
-  Sprite maze;
   Maze maze_obj;
   std::vector<std::unique_ptr<Ghost>> ghosts;
+  int score;
+  int num_pellets;
 };
 #endif

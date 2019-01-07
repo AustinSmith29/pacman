@@ -15,7 +15,8 @@ GameState::GameState(GraphicsLoader *graphics_loader)
   ghosts.push_back(ghost_factory(graphics_loader, GhostType::ORANGE));
   ghosts.push_back(ghost_factory(graphics_loader, GhostType::PINK));
   maze_obj.init(graphics_loader);
-  maze = graphics_loader->load_sprite("maze.bmp");
+  score = 0;
+  num_pellets = 244;
 }
 
 void
@@ -48,29 +49,35 @@ GameState::update_logic()
   for (int i = 0; i < ghosts.size(); i++)
     {
       ghosts[i]->update(maze_obj, state);
-      if (ghosts[i]->is_eatable())
+      int ghost_x = ghosts[i]->get_x();
+      int ghost_y = ghosts[i]->get_y();
+      maze_obj.screen_to_grid(ghost_x, ghost_y);
+      int pac_x = px;
+      int pac_y = py;
+      maze_obj.screen_to_grid(pac_x, pac_y);
+      if (pac_x == ghost_x && pac_y == ghost_y)
         {
-          int ghost_x = ghosts[i]->get_x();
-          int ghost_y = ghosts[i]->get_y();
-          maze_obj.screen_to_grid(ghost_x, ghost_y);
-          int pac_x = px;
-          int pac_y = py;
-          maze_obj.screen_to_grid(pac_x, pac_y);
-          if (pac_x == ghost_x && pac_y == ghost_y)
+          if (ghosts[i]->is_eatable())
             {
               ghosts[i]->set_state(GhostState::EATEN);
             }
+          else
+            {
+              pacman.die();
+            }
         }
-
     }
 
-  if (maze_obj.item_at(px, py) == TileType::DOT)
+  if (maze_obj.item_at(px + 8, py + 8) == TileType::DOT)
     {
+      score += 10;
       maze_obj.remove_at(px, py);
+      num_pellets--;
     }
 
-  if (maze_obj.item_at(px, py) == TileType::BIGDOT)
+  if (maze_obj.item_at(px + 8, py + 8) == TileType::BIGDOT)
     {
+      score += 50;
       maze_obj.remove_at(px, py);
       // replace with for_each
       for (int i = 0; i < ghosts.size(); i++)
@@ -89,11 +96,12 @@ GameState::update_logic()
     }
 }
 
-void 
+void
 GameState::draw(SDL_Renderer *renderer)
 {
-  pacman.draw(renderer); // pacman drawn first cuz of side tunnel hack.
+  //pacman.draw(renderer); // pacman drawn first cuz of side tunnel hack.
   maze_obj.draw(renderer);
+  pacman.draw(renderer); // pacman drawn first cuz of side tunnel hack.
   for (int i = 0; i < ghosts.size(); i++)
     {
       ghosts[i]->draw(renderer);

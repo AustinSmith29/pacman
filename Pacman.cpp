@@ -3,12 +3,20 @@
 void
 Pacman::init(GraphicsLoader *loader)
 {
-  pacman_right = loader->load_animation("pacman_right.dat");
-  pacman_up    = loader->load_animation("pacman_up.dat");
-  pacman_left  = loader->load_animation("pacman_left.dat");
-  pacman_down  = loader->load_animation("pacman_down.dat");
+  pacman_right = loader->load_animation("data/pacman_right.dat");
+  pacman_up    = loader->load_animation("data/pacman_up.dat");
+  pacman_left  = loader->load_animation("data/pacman_left.dat");
+  pacman_down  = loader->load_animation("data/pacman_down.dat");
+  pacman_die   = loader->load_animation("data/pacman_die.dat");
   current_animation = &pacman_left;
 
+  reset();
+}
+
+void
+Pacman::reset()
+{
+  current_animation = &pacman_left;
   x = 318;
   y = 272;
   velocity_x = -2;
@@ -44,6 +52,18 @@ Pacman::move_down()
 {
   next_direction = DOWN;
   changed_direction = (next_direction == direction) ? false : true;
+}
+
+void
+Pacman::tunnel_left()
+{
+  x = 550;
+}
+
+void
+Pacman::tunnel_right()
+{
+  x = 100;
 }
 
 int Pacman::get_x() { return x; }
@@ -84,7 +104,7 @@ Pacman::change_direction(Maze &maze)
           direction = UP;
         }
       break;
-	  
+
     case RIGHT:
       if (maze.item_at(x+24, y+8) != TileType::WALL)
         {
@@ -96,7 +116,7 @@ Pacman::change_direction(Maze &maze)
           direction = RIGHT;
         }
       break;
-	  
+
     case DOWN:
       if (maze.item_at(x+8, y+28) != TileType::WALL)
         {
@@ -171,5 +191,16 @@ Pacman::handle_collisions(Maze &maze)
           pause_animation(*current_animation);
           y = maze.snap_y(y+8);
         }
+    }
+}
+
+void
+Pacman::die()
+{
+  switch_animation(*current_animation, pacman_die);
+  current_animation = &pacman_die;
+  if (is_animation_complete(*current_animation))
+    {
+      reset();
     }
 }

@@ -9,7 +9,7 @@
 #include <memory>
 
 #define SCARED_SPEED 1
-#define RETURN_SPEED 4
+#define RETURN_SPEED 6
 
 /**
  * AIState contains information that is important for Ghost path calculations.
@@ -66,7 +66,7 @@ class Ghost
   bool is_eatable();
 
   /** Performs the logic for the ghost depending on its state. **/
-  void update(Maze &maze, AIState &state); 
+  void update(Maze &maze, AIState &state);
 
   /** Set ghost target to specified coordinates. Ghost will
    *  begin moving towards the given coordinates.

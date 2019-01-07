@@ -233,8 +233,11 @@ Ghost::follow_path()
       // jump back, only to jump back yet again. Rinse Recycle Repeat.
       // Maybe fix by checking the grid cell... but then we will have to check for
       // intersections so ghosts don't change direction prematurely.
-      if (abs(x - target_x) <= current_speed && abs(y - target_y) <= current_speed) 
+      int dist_target = (int)sqrt(pow(target_x - x, 2) + pow(target_y - y, 2));
+      if (dist_target <= current_speed)
         {
+          x = target_x;
+          y = target_y;
           path.pop();
         }
       int dx = target_x - x;

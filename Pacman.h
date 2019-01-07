@@ -8,11 +8,14 @@ class Pacman
 {
  public:
   void init(GraphicsLoader *loader);
-  
+
   void move_left();
   void move_up();
   void move_right();
   void move_down();
+  void tunnel_left();
+  void tunnel_right();
+  void die();
 
   int get_x();
   int get_y();
@@ -20,7 +23,7 @@ class Pacman
 
   void update(Maze &maze);
   void draw(SDL_Renderer *renderer);
-  
+
  private:
   int x, y;
   int velocity_x, velocity_y;
@@ -32,9 +35,11 @@ class Pacman
   Animation pacman_up;
   Animation pacman_right;
   Animation pacman_down;
+  Animation pacman_die;
   Animation *current_animation;
 
   void change_direction(Maze &maze);
   void handle_collisions(Maze &maze);
+  void reset();
 };
 #endif
